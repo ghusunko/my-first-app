@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Deploy
 
 on:
   push:
@@ -23,4 +23,15 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghusunoko/my-first-app:latest
+          tags: |
+            ghusunoko/my-first-app:latest
+            ghusunoko/my-first-app:${{ github.sha }}
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/my-first-app my-first-app=docker.io/ghusunoko/my-first-app:${{ github.sha }} -n meet-practice
+          kubectl rollout status deployment/my-first-app -n meet-practice --timeout=120s
