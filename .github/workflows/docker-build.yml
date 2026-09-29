@@ -32,6 +32,8 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Deploy to Kubernetes
+        env:
+          KUBECONFIG: /root/.kube/config
         run: |
           kubectl set image deployment/my-first-app my-first-app=docker.io/ghusunoko/my-first-app:${{ github.sha }} -n meet-practice
           kubectl rollout status deployment/my-first-app -n meet-practice --timeout=120s
